@@ -1,0 +1,85 @@
+DC CRIME LOCATER
+
+Created by: Mark J. Headd, www.voiceingov.org
+Submitted to: APPS08, http://www.appsfordemocracy.org/about/
+
+*****
+Description:
+
+The DC Crime Locater is a multimodal application that is designed to improve access to crime information made available by the District of Columbia.  "Multimodal Applications" provide access to services and information through different modalities.  This application provides access to crime information, including the ability to search for crime incidents by proximity, through a wide range of different client devices include traditional web browsers, handheld devices and PDAs, cell phones and standard land line telephones.
+
+Unlike other applications that are targeted to a specific platform -- i.e., applications targeted to a desktop web browser, or to a specific handheld device -- the DC Crime Locater can be accessed from a range of different devices.  The application is accessible from sophisticated handheld devices like iPhones or G1 phones and from standard home telephones.
+
+This Multimodal paradigm can be used to improve access to other types of government information giving citizens more choices in the devices (and modalities) they will use to consume this information.
+
+
+*****
+Create and populate MySQL database:
+
+This application uses data from the DC Data Catalog (http://data.octo.dc.gov/) which is stored in a MySQL database.
+
+1. Download DC Crime data from http://data.octo.dc.gov.  Select "Crime incidents (ASAP) 2008" and choose CSV format.
+2. Create MySQL database table.  Run the SQL script at db/crime_incidents.sql to create the table called crime_incidents_2008.
+3. Import DC crime data - e.g., using a tool like phpMyAdmin or command line tool
+
+
+*****
+Required information:
+
+This application uses two different web services to obtain address information from a telephone number, and to geocode (i.e., obtain latitude and longitude coordinates) an address.  Both web services are available on a trial or free (for non-commercial use) basis.
+
+DOTS Geophone Web Service: http://www.serviceobjects.com/products/dots_geophone.asp
+Required information:
+-- License Key
+-- WSDL URI of Service
+(Place these values in the common/serviceSettings.php file where indicated)
+
+geocode.us Web Service: http://geocoder.us/
+Required information:
+-- user name / password
+-- WSDL URI of Service
+(Place these values in the common/serviceSettings.php file where indicated)
+
+
+*****
+Install and set up:
+
+The DC Crime Locater requires PHP 5 and a MySQL database.
+
+The source code for the DC Crime Locater can be obtained from 
+
+Once the database table holding crime information has been created and populated, there are two configuration files that need to be modified.
+
+* common/config.php -- holds general config information.  Database access information must be added in the "Customizable settings" section.
+* common/serviceSettings.php -- hold credentials and WSDL information for the two web services used by the application.
+
+Error logs are written to error_log/log.txt -- you do not need to create this file in advance, it will be created when the first exception is written to the file.  You may need to change the permission on the error_log directory so that the application can create / write to the log.txt file.
+
+To use a voice browser to access this application, you will need to download a CCXML/VoiceXML browser.  A high quality, free CCXML/VoiceXML browser that runs on Windows or Linux can be obtained from http://www.voxeo.com/prophecy/.  Instructions on how to set up a call route in Voxeo Prophecy are listed below in "Running the Application".  Note - Voxeo Prophecy does not need to be running on the same physical machine as the DC Crime Locater application, but it must be able to make HTTP requests (port 80) to the machine hosting the application
+
+
+*****
+Running the application:
+
+To view the application in a mobile device or a desktop browser, go to http://host/dc/index.php.  The default config setting for this application is to use a simulator (to mimic the look and feel of a cell phone mini browser) when viewing from a desktop browser.  To enable plain XHTML rendering when using a desktop browser, simply change the config setting $useSimulator to false.
+
+To use a voice browser to access this application, you must set up a call route in Voxeo Prophecy:
+
+1. Make sure Prophecy services are started.
+
+2. Open the Prophecy Management Console (http://prophecy_host:9995/mc.php).  Default login credentials are admin/admin.
+
+3. In the "Call Roting" tab, set up a route for the DC Crime Locater:
+	- Set the Route ID to an alphanumeric string or a 10 digit phone number (e.g., crime, 2021234567).
+	- Set the Route Type to CCXML W3C
+	- Set the Route URL to http://host/dc/dc_inbound.xml
+	- At the bottom of this page, click "Save Changes"
+
+4. Open a SIP softphone (note, Prophecy comes bundled with a very nice one) and dial sip:route_id@prophecy_host:5060
+	- If you set up a route using a route ID of "crime" and Prophecy is running on the same machine as your SIP phone, you would dial sip:crime@127.0.0.1:5060
+	- If you set up a route using a route ID of "2021234567" and Prophecy is running on a remote machine, you would dial something like sip:2021234567@192.168.1.41:5060
+
+*****
+Questions / Comments
+
+Visit http://www.voiceingov.org for posts on the DC Crime Locater application.

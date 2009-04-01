@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<vxml xmlns="http://www.w3.org/2001/vxml" version="2.0">
+
+<meta name="maintainer" content="mheadd@voiceingov.org"/>
+
+<!-- 
+This work is licensed under a Creative Commons License 
+To review this license, go to http://creativecommons.org/licenses/by-sa/3.0/us/
+-->
+
+<!-- 
+To enable speech recognition, change the value of the inputmodes property as follows:
+<property name="inputmodes" value="voice"/>
+
+You can enable both touch tone and speech recognition changing the value of the inputmodes property as follows:
+<property name="inputmodes" value="dtmf voice"/>
+-->
+
+<property name="inputmodes" value="dtmf"/>
+
+<property name="fetchtimeout" value="30s"/>
+<property name="fetchaudio" value="vxml/fetch_audio_file.wav"/>
+
+<noinput>
+<prompt>The system did not pick up your response.</prompt>
+<reprompt/>
+</noinput>
+
+<nomatch>
+<prompt>That was not a valid response.</prompt>
+<reprompt/>
+</nomatch>
+
+<catch event="noinput nomatch" count="3">
+<log>*** Caller reached error max. ***</log>
+<prompt>The system is having difficulty understanding your input, please try your call again later.  Goodbye.</prompt>
+<exit/>
+</catch>
+
+<catch event="connection.disconnect">
+<log>*** Caller hung up. ***</log>
+<exit/>
+</catch>
+
+<error>
+<log>*** An error occured: <value expr="_event"/>. ***</log>
+<prompt>Sorry.  The system is experiencing techncial difficulties.  Please try your call again later.</prompt>
+<exit/>
+</error>
+
+</vxml>

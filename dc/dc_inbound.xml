@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ccxml version="1.0" xmlns="http://www.w3.org/2002/09/ccxml">
+
+  <var name="myState" expr="'init'"/>
+  <var name="session_id" expr="session.id"/>
+  <var name="connection_id"/>
+  <var name="dialog_id"/>
+  <var name="ani"/>
+
+  <eventprocessor statevariable="myState">
+
+    <transition event="ccxml.loaded">
+  		<!-- End call after 5 minutes-->
+		<send target="session_id" name="'sessionEnd'" delay="'300s'"/>
+    </transition>
+		
+    <transition state="init" event="connection.alerting">
+      	<log expr="'*** Call is coming in... ***'"/>
+		<assign name="connection_id" expr="event$.connectionid"/>
+		<assign name="ani" expr="event$.connection.remote"/>
+		<assign name="myState" expr="'connecting'"/>
+		<accept connectionid="connection_id"/>
+    </transition>
+		
+    <transition state="connecting" event="connection.connected">
+      	<log expr="'*** Call is connected, send the caller to the dialog... ***'"/>
+		<assign name="myState" expr="'connected'"/>
+      	<dialogstart src="'index.php'" connectionid="connection_id" dialogid="dialog_id" namelist="ani"/>
+    </transition>
+
+    <transition state="connected" event="dialog.started">
+      	<log expr="'*** Dialog has started... ***'"/>
+    </transition>
+
+    <transition state="connected" event="error.dialog.notstarted">
+      	<log expr="'*** ERROR: Could not start the dialog. ***'"/>
+      	<exit/>
+    </transition>
+
+    <transition state="connected" event="dialog.exit">
+		<log expr="'*** Call is over. ***'"/>
+		<exit/>
+    </transition>
+		
+    <transition event="error.*">
+      	<log expr="'*** ERROR HAS OCCURED: ' + event$.reason + ' ***'"/>
+      	<exit/>
+    </transition>
+
+    <transition event="sessionEnd">
+      	<exit/>
+    </transition>
+
+  </eventprocessor>
+</ccxml>
